@@ -1,1 +1,0 @@
-# theminh-tiptracker

@@ -1,0 +1,13 @@
+{
+  "name": "theminh-tiptracker",
+  "version": "1.0.0",
+  "description": "Tip tracking system for The MINH restaurant",
+  "main": "index.js",
+  "scripts": {
+    "dev": "netlify dev",
+    "build": "echo 'No build needed'"
+  },
+  "dependencies": {
+    "pg": "^8.11.3"
+  }
+}

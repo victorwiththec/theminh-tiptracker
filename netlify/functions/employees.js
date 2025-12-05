@@ -12,8 +12,7 @@ exports.handler = async (event) => {
       );
       return {
         statusCode: 200,
-        body: JSON.stringify(res.rows),
-      };
+body: JSON.stringify(res.rows.map(r => ({...r, pin: String(r.pin)}))),      };
     }
 
     return { statusCode: 405, body: 'Method not allowed' };

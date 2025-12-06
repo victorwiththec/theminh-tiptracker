@@ -75,7 +75,7 @@ exports.handler = async (event) => {
 
     return { statusCode: 405, body: JSON.stringify({ error: 'Method not allowed' }) };
   } catch (err) {
-    console.error(err);
+    console.errorconsole.log('Tips INSERT Error:', err, 'Params:', [waitress_name, finalAmount, method, date, notes]);
     return { statusCode: 500, body: JSON.stringify({ error: err.message }) };
   } finally {
     await client.end();

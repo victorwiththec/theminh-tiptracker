@@ -22,7 +22,7 @@ exports.handler = async (event) => {
 
       const tipRes = await client.query(
     'INSERT INTO tips (waitress_name, amount, method, date, notes, paid) VALUES ($1, $2, $3, $4, $5, false) RETURNING *',
-    [waitress_name, finalAmount, method, date, notes || null, false]);
+    [waitress_name, finalAmount, method, date, notes || null, f]
       await client.query(
         'INSERT INTO audit_log (action, details, "user") VALUES ($1, $2, $3)',
         ['tip_recorded', `Tip: ${waitress_name}, ${finalAmount} Ft (${method}), ${date}`, 'Admin']

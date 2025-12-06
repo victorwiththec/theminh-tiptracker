@@ -441,7 +441,101 @@
 </head>
 <body>
     <!-- Login Screen -->
-    <div id="loginScreen" class="screen active">
+
+    
+/* Action Buttons and Modals */
+.action-btn {
+  padding: 5px 10px;
+  margin: 0 5px;
+  font-size: 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+  background-color: #f5f5f5;
+  transition: background-color 0.2s;
+}
+
+.action-btn:hover {
+  background-color: #e0e0e0;
+}
+
+.payout-btn {
+  background-color: #ff9800;
+  color: white;
+  border-color: #ff9800;
+}
+
+.payout-btn:hover {
+  background-color: #e68900;
+}
+
+.modify-btn {
+  background-color: #2196F3;
+  color: white;
+  border-color: #2196F3;
+}
+
+.modify-btn:hover {
+  background-color: #0b7dda;
+}
+
+.modal {
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modal-content {
+  background-color: #fefefe;
+  margin: 15% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%;
+  max-width: 400px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.modal-content h2 {
+  margin-top: 0;
+  color: #333;
+}
+
+.modal-content input,
+.modal-content textarea {
+  width: 100%;
+  padding: 8px;
+  margin: 10px 0;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-family: inherit;
+}
+
+.modal-content button {
+  background-color: #4CAF50;
+  color: white;
+  padding: 10px 20px;
+  margin: 5px 5px 5px 0;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.modal-content button:hover {
+  background-color: #45a049;
+}
+
+.modal-content button:last-child {
+  background-color: #f44336;
+}
+
+.modal-content button:last-child:hover {
+  background-color: #da190b;
+}<div id="loginScreen" class="screen active">
         <div class="login-container">
             <h1>🍜 The MINH<br>Tip Tracker</h1>
             
@@ -509,6 +603,7 @@
                         <th>Name</th>
                         <th>Role</th>
                         <th>Unpaid Balance (HUF)</th>
+                        			<th>Actions</th>
                     </tr>
                 </thead>
                 <tbody id="balancesTableBody">
@@ -1052,6 +1147,7 @@
                         <td>${e.name}</td>
                         <td>${role}</td>
                         <td>${balance.toLocaleString('hu-HU')} HUF</td>
+                        			<td><button class='action-btn payout-btn' onclick='openPayoutModal(${e.employee_id})'>Payout</button><button class='action-btn modify-btn' onclick='openModifyModal(${e.employee_id})'>Modify</button></td>
                     </tr>
                 `;
             });
@@ -1291,7 +1387,161 @@
                     alert('Error: ' + err.message);
                 }
             }
-        }
+        
+        
+// Modal Functions for Admin Dashboard
+let currentEmployeeId = null;
+
+function openPayoutModal(employeeId) {
+  if (appState.userType !== 'admin') {
+    alert('Only admin can process payouts');
+    return;
+  }
+  currentEmployeeId = employeeId;
+  const employee = appState.employees.find(e => e.employee_id === employeeId);
+  const balance = appState.outstanding;
+  
+  document.getElementById('payoutEmployeeName').textContent = `Employee: ${employee.name}`;
+  document.getElementById('payoutCurrentBalance').textContent = balance.toLocaleString('hu-HU');
+  document.getElementById('payoutAmount').value = '';
+  document.getElementById('payoutReason').value = '';
+  document.getElementById('payoutModal').style.display = 'block';
+}
+
+function closePayoutModal() {
+  document.getElementById('payoutModal').style.display = 'none';
+  currentEmployeeId = null;
+}
+
+async function submitPayout() {
+  if (appState.userType !== 'admin') {
+    alert('Unauthorized');
+    return;
+  }
+  const amount = parseInt(document.getElementById('payoutAmount').value);
+  const reason = document.getElementById('payoutReason').value;
+  
+  if (!amount || amount <= 0) {
+    alert('Please enter a valid amount');
+    return;
+  }
+  
+  if (!reason.trim()) {
+    alert('Please enter a reason');
+    return;
+  }
+  
+  try {
+    const res = await fetch(`${API_BASE}/payouts`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        employee_id: currentEmployeeId,
+        amount: amount,
+        reason: reason,
+        date: new Date().toISOString()
+      })
+    });
+    
+    if (!res.ok) throw new Error('Failed to process payout');
+    
+    alert('Payout processed successfully!');
+    closePayoutModal();
+    await loadAllData();
+    renderBalances();
+  } catch (err) {
+    alert('Error: ' + err.message);
+  }
+}
+
+function openModifyModal(employeeId) {
+  if (appState.userType !== 'admin') {
+    alert('Only admin can modify tips');
+    return;
+  }
+  currentEmployeeId = employeeId;
+  const employee = appState.employees.find(e => e.employee_id === employeeId);
+  const tips = appState.tips.filter(t => t.employee_name === employee.name && !t.paid);
+  const total = tips.reduce((sum, t) => sum + t.amount, 0);
+  
+  document.getElementById('modifyEmployeeName').textContent = `Employee: ${employee.name}`;
+  document.getElementById('modifyCurrentTotal').textContent = total.toLocaleString('hu-HU');
+  document.getElementById('modifyAmount').value = '';
+  document.getElementById('modifyReason').value = '';
+  document.getElementById('modifyModal').style.display = 'block';
+}
+
+function closeModifyModal() {
+  document.getElementById('modifyModal').style.display = 'none';
+  currentEmployeeId = null;
+}
+
+async function submitModify() {
+  if (appState.userType !== 'admin') {
+    alert('Unauthorized');
+    return;
+  }
+  const amount = parseInt(document.getElementById('modifyAmount').value);
+  const reason = document.getElementById('modifyReason').value;
+  
+  if (amount === 0 || !amount) {
+    alert('Please enter an amount to add or subtract');
+    return;
+  }
+  
+  if (!reason.trim()) {
+    alert('Please enter a reason');
+    return;
+  }
+  
+  try {
+    const res = await fetch(`${API_BASE}/tips`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        employee_name: appState.employees.find(e => e.employee_id === currentEmployeeId).name,
+        amount: amount,
+        date: new Date().toISOString().split('T')[0],
+        method: 'adjustment',
+        note: reason
+      })
+    });
+    
+    if (!res.ok) throw new Error('Failed to modify tips');
+    
+    alert('Tips updated successfully!');
+    closeModifyModal();
+    await loadAllData();
+    renderBalances();
+  } catch (err) {
+    alert('Error: ' + err.message);
+  }
+}}
     </script>
+    
+<!-- Modals for Payout and Modify -->
+<div id='payoutModal' class='modal' style='display: none;'>
+  <div class='modal-content'>
+    <h2>Process Payout</h2>
+    <p id='payoutEmployeeName'></p>
+    <p>Current Unpaid Balance: <span id='payoutCurrentBalance'></span> HUF</p>
+    <input type='number' id='payoutAmount' placeholder='Enter payout amount' min='0'>
+    <textarea id='payoutReason' placeholder='Reason for payout'></textarea>
+    <button onclick='submitPayout()'>Process Payout</button>
+    <button onclick='closePayoutModal()'>Cancel</button>
+  </div>
+</div>
+
+<div id='modifyModal' class='modal' style='display: none;'>
+  <div class='modal-content'>
+    <h2>Modify Total Tips</h2>
+    <p id='modifyEmployeeName'></p>
+    <p>Current Total: <span id='modifyCurrentTotal'></span> HUF</p>
+    <input type='number' id='modifyAmount' placeholder='Amount to add/subtract'>
+    <textarea id='modifyReason' placeholder='Reason for modification'></textarea>
+    <button onclick='submitModify()'>Update Tips</button>
+    <button onclick='closeModifyModal()'>Cancel</button>
+  </div>
+</div>
 </body>
 </html>

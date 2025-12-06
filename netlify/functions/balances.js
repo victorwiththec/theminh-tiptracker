@@ -8,15 +8,19 @@ const SPLIT = {
 
 exports.handler = async (event) => {
   const { httpMethod, path } = event;
-  const client = await getClient();
+  let client;
 
   try {
+    client = await getClient();
+
+    // GET /balance/:name
     if (httpMethod === 'GET' && path.includes('/balance/')) {
       const name = decodeURIComponent(path.split('/').pop());
       const balance = await calculateEmployeeBalance(client, name);
       return { statusCode: 200, body: JSON.stringify({ name, balance }) };
     }
 
+    // GET /balances
     if (httpMethod === 'GET') {
       const employees = await client.query(
         'SELECT name FROM employees WHERE deleted = false ORDER BY name'
@@ -32,10 +36,10 @@ exports.handler = async (event) => {
 
     return { statusCode: 405, body: JSON.stringify({ error: 'Method not allowed' }) };
   } catch (err) {
-    console.error(err);
+    console.error('Balances handler error:', err);
     return { statusCode: 500, body: JSON.stringify({ error: err.message }) };
   } finally {
-    await client.end();
+    if (client) await client.end();
   }
 };
 
@@ -47,19 +51,27 @@ async function calculateEmployeeBalance(client, name) {
   let balance = 0;
 
   if (emp.is_waitress) {
+    // Waitress: 50% of tips they personally served
     const tipsRes = await client.query(
       'SELECT SUM(amount) as total FROM tips WHERE waitress_name = $1 AND paid = false',
       [name]
     );
     balance += Math.floor((tipsRes.rows[0].total || 0) * SPLIT.waitress);
   } else if (emp.title === 'Chef') {
-    const tipsRes = await client.query('SELECT SUM(amount) as total FROM tips WHERE paid = false');
+    // Chef: 25% of ALL unpaid tips
+    const tipsRes = await client.query(
+      'SELECT SUM(amount) as total FROM tips WHERE paid = false'
+    );
     balance += Math.floor((tipsRes.rows[0].total || 0) * SPLIT.chef);
   } else if (emp.title === 'Prepcook') {
-    const tipsRes = await client.query('SELECT SUM(amount) as total FROM tips WHERE paid = false');
+    // Prepcook: 25% of ALL unpaid tips
+    const tipsRes = await client.query(
+      'SELECT SUM(amount) as total FROM tips WHERE paid = false'
+    );
     balance += Math.floor((tipsRes.rows[0].total || 0) * SPLIT.prepcook);
   }
 
+  // Subtract completed and pending payouts
   const payoutsRes = await client.query(
     'SELECT SUM(amount) as total FROM payouts WHERE employee_name = $1 AND status IN ($2, $3)',
     [name, 'completed', 'pending']

@@ -1169,7 +1169,7 @@
                         <td>${e.name}</td>
                         <td>${role}</td>
                         <td>${balance.toLocaleString('hu-HU')} HUF</td>
-                        <td><button class='action-btn payout-btn' onclick='openPayoutModal(${e.id})'>Payout</button><button class='action-btn modify-btn' onclick='openModifyModal(${e.id})'>Modify</button></td>
+                        <td><button class='action-btn payout-btn' onclick='window.openPayoutModal(${e.id})'>Payout</button><button class='action-btn modify-btn' onclick='window.openModifyModal(${e.id})'>Modify</button></td>
 
                     </tr>
                 `;

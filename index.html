@@ -186,10 +186,6 @@
         .login-container button {
             width: 100%;
         }
-         
-.login-page-wrapper.hidden {
-    display: none;
-}
 
         /* Admin Screen */
         .admin-header {
@@ -588,8 +584,7 @@
     <div id="adminScreen" class="screen">
         <header class="admin-header">
             <h1>Admin Dashboard</h1>
-            <button class="btn btn-secondary" onclick="logout()
-                ">Logout</button>
+            <button class="btn btn-secondary" onclick="logout()">Logout</button>
         </header>
 
         <nav class="admin-tabs">
@@ -870,8 +865,7 @@
 
         // Initialize
         window.addEventListener('load', () => {
-            document.getElementById('80
-                                    ').focus();
+            document.getElementById('pinInput').focus();
             const today = new Date().toISOString().split('T')[0];
             if (document.getElementById('tipDate')) {
                 document.getElementById('tipDate').value = today;
@@ -882,11 +876,9 @@
         });
 
         // Login
-        async function handleLogin
-            (event) {
+        async function handleLogin(event) {
             event.preventDefault();
-            const pin = document.getElementById('8
-                                                ').value;
+            const pin = document.getElementById('pinInput').value;
             const userType = document.querySelector('.tab-btn.active').textContent.toLowerCase();
 
             try {
@@ -914,7 +906,6 @@
 
                 await loadAllData();
                 switchScreen(userType === 'admin' ? 'adminScreen' : 'staffScreen');
-                document.querySelector('.login-page-wrapper').classList.add('hidden');
             } catch (err) {
                 console.error(err);
                 showMessage('loginError', 'Login failed: ' + err.message, 'error');
@@ -939,7 +930,6 @@
             document.getElementById('pinInput').value = '';
             switchScreen('loginScreen');
             document.getElementById('pinInput').focus();
-            document.querySelector('.login-page-wrapper').classList.remove('hidden');
         }
 
         // Screen Switching

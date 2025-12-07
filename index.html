@@ -905,6 +905,7 @@
                 appState.userType = userType;
 
                 await loadAllData();
+                        document.getElementById('loginScreen').style.display = 'none';
                 switchScreen(userType === 'admin' ? 'adminScreen' : 'staffScreen');
             } catch (err) {
                 console.error(err);
@@ -1167,7 +1168,7 @@
                         <td>${e.name}</td>
                         <td>${role}</td>
                         <td>${balance.toLocaleString('hu-HU')} HUF</td>
-                        <td><button class='action-btn payout-btn' onclick='openPayoutModal(${e.employee_id})'>Payout</button><button class='action-btn modify-btn' onclick='openModifyModal(${e.employee_id})'>Modify</button></td>
+                        <td><button class='action-btn payout-btn' onclick='openPayoutModal(${e.id})'>Payout</button><button class='action-btn modify-btn' onclick='openModifyModal(${e.id})'>Modify</button></td>
 
                     </tr>
                 `;
@@ -1420,7 +1421,7 @@ function openPayoutModal(employeeId) {
     return;
   }
   currentEmployeeId = employeeId;
-  const employee = appState.employees.find(e => e.employee_id === employeeId);
+  const employee = appState.employees.find(e => e.id === employeeId);
   const balance = appState.outstanding;
   
   document.getElementById('payoutEmployeeName').textContent = `Employee: ${employee.name}`;
@@ -1458,7 +1459,7 @@ async function submitPayout() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        employee_id: currentEmployeeId,
+        id: currentEmployeeId,
         amount: amount,
         reason: reason,
         date: new Date().toISOString()
@@ -1482,7 +1483,7 @@ function openModifyModal(employeeId) {
     return;
   }
   currentEmployeeId = employeeId;
-  const employee = appState.employees.find(e => e.employee_id === employeeId);
+  const employee = appState.employees.find(e => e.id === employeeId);
   const tips = appState.tips.filter(t => t.employee_name === employee.name && !t.paid);
   const total = tips.reduce((sum, t) => sum + t.amount, 0);
   
@@ -1521,7 +1522,7 @@ async function submitModify() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        employee_name: appState.employees.find(e => e.employee_id === currentEmployeeId).name,
+        employee_name: appState.employees.find(e => e.id === currentEmployeeId).name,
         amount: amount,
         date: new Date().toISOString().split('T')[0],
         method: 'adjustment',

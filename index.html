@@ -1033,13 +1033,15 @@
                 // 1. Card fee (if applicable)
                 let netAmount = amount;
                 if (method === 'card') {
-                    netAmount = Math.round(amount * 0.95); // 5% fee
+                    netAmount = Math.floor(amount * 95 / 100); // 5% fee
                 }
         
                 // 2. Split: 50% waitress, 25% chef, 25% prepcook
-                const waitressAmount = Math.round(netAmount * 0.5);
-                const chefAmount = Math.round(netAmount * 0.25);
+              
+                const waitressAmount = Math.floor(netAmount * 0.5);
+                const chefAmount = Math.floor(netAmount * 0.25);
                 const prepAmount = netAmount - waitressAmount - chefAmount;
+
         
                 // 3. Find Chef and Prepcook by title
                 const chef = appState.employees.find((e) => e.title === 'Chef');

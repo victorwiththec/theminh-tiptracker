@@ -1010,7 +1010,7 @@
             });
         }
 
-        // Record Tip
+             // Record Tip
         async function recordTip(event) {
             event.preventDefault();
             const date = document.getElementById('tipDate').value;
@@ -1030,33 +1030,25 @@
             }
         
             try {
-                // 1. Apply card fee if needed (same total logic as before, adjust if you don’t use fees)
+                // 1. Card fee (if applicable)
                 let netAmount = amount;
                 if (method === 'card') {
-                    // 5% fee -> keep 95%; change this if your fee is different
-                    netAmount = Math.round(amount * 0.95);
+                    netAmount = Math.round(amount * 0.95); // 5% fee
                 }
         
-                // 2. Calculate shares: 50% waitress, 25% chef, 25% prep
+                // 2. Split: 50% waitress, 25% chef, 25% prepcook
                 const waitressAmount = Math.round(netAmount * 0.5);
                 const chefAmount = Math.round(netAmount * 0.25);
-                const prepAmount = netAmount - waitressAmount - chefAmount; // keeps total correct
+                const prepAmount = netAmount - waitressAmount - chefAmount;
         
-                // 3. Find chef and prep cook in appState.employees
-                //    - Chef = first employee where e.title === 'chef'
-                //    - Prepcook = first employee where e.title === 'prepcook'
-                //      (this matches how employees are stored: is_waitress / title)[file:1]
-                const chef = appState.employees.find(
-                    (e) => !e.deleted && !e.archived && e.title === 'chef'
-                );
-                const prepCook = appState.employees.find(
-                    (e) => !e.deleted && !e.archived && e.title === 'prepcook'
-                );
+                // 3. Find Chef and Prepcook by title
+                const chef = appState.employees.find((e) => e.title === 'chef');
+                const prepCook = appState.employees.find((e) => e.title === 'prepcook');
         
-                // 4. Build list of tip entries to send
+                // 4. Build entries
                 const tipEntries = [];
         
-                // Waitress share (always)
+                // Waitress share
                 tipEntries.push({
                     waitress_name: waitress,
                     amount: waitressAmount,
@@ -1065,7 +1057,7 @@
                     notes: (notes || '') + ' (50% waitress share)',
                 });
         
-                // Chef share (only if chef exists and amount > 0)
+                // Chef share
                 if (chef && chefAmount > 0) {
                     tipEntries.push({
                         waitress_name: chef.name,
@@ -1076,7 +1068,7 @@
                     });
                 }
         
-                // Prep cook share (only if prep cook exists and amount > 0)
+                // Prepcook share
                 if (prepCook && prepAmount > 0) {
                     tipEntries.push({
                         waitress_name: prepCook.name,
@@ -1087,20 +1079,16 @@
                     });
                 }
         
-                // 5. Send all tip entries to the API one by one
+                // 5. Send all entries
                 for (const entry of tipEntries) {
                     const res = await fetch(`${API_BASE}/tips`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(entry),
                     });
-        
-                    if (!res.ok) {
-                        throw new Error('Failed to record tip');
-                    }
+                    if (!res.ok) throw new Error('Failed to record tip');
                 }
         
-                // 6. UI feedback and refresh
                 showMessage('recordTipMessage', 'Tip recorded and split successfully!', 'success');
                 event.target.reset();
                 await loadAllData();

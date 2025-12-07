@@ -581,7 +581,8 @@
     </div>
 
     <!-- Admin Dashboard -->
-    <div id="adminScreen" class="screen">
+    908
+    "adminScreen" class="screen">
         <header class="admin-header">
             <h1>Admin Dashboard</h1>
             <button class="btn btn-secondary" onclick="logout()">Logout</button>
@@ -905,7 +906,8 @@
                 appState.userType = userType;
 
                 await loadAllData();
-                        document.getElementById('loginScreen').style.display = 'none';
+                        const loginWrapper = document.querySelector('.login-page-wrapper');
+                        if (loginWrapper) loginWrapper.style.display = 'none';
                 switchScreen(userType === 'admin' ? 'adminScreen' : 'staffScreen');
             } catch (err) {
                 console.error(err);

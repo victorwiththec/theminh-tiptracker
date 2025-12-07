@@ -93,6 +93,34 @@
             font-size: 12px;
         }
 
+         
+/* Page Header */
+.page-header {
+  background: linear-gradient(135deg, #1a6b5c 0%, #2d8f7e 100%);
+  padding: 30px 20px;
+  text-align: center;
+  color: white;
+  margin-bottom: 40px;
+}
+.page-header h1 {
+  font-size: 32px;
+  margin: 0 0 10px 0;
+  font-weight: 600;
+}
+.page-header p {
+  font-size: 16px;
+  margin: 0;
+  opacity: 0.95;
+}
+
+/* Login Screen Page Container */
+.login-page-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: #faf7f2;
+}
+
         /* Login Screen */
 #loginScreen.active {            display: flex;
             align-items: center;
@@ -520,6 +548,11 @@
     </style>
 </head>
 <body>
+      <div class="page-header">
+    <h1>🌮 The MINH<br>Tip Tracker</h1>
+    <p>Track and manage tips efficiently</p>
+  </div>
+  <div class="login-page-wrapper">
     <!-- Login Screen -->
 
         <div class="login-container">
@@ -1530,6 +1563,6 @@ async function submitModify() {
     <button onclick='closeModifyModal()'>Cancel</button>
   </div>
 </div>
+      </div>  <!-- End of login-page-wrapper -->
 </body>
 </html>
-445

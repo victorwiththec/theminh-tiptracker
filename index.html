@@ -1196,12 +1196,7 @@
             tbody.innerHTML = '';
 
             appState.employees.forEach((e) => {
-                let balance = 0;
-                if (e.is_waitress) {
-                    const myTips = appState.tips.filter((t) => t.waitress_name === e.name && !t.paid);
-                    balance = Math.floor(myTips.reduce((sum, t) => sum + Math.floor(t.amount * 0.5), 0));
-                }
-
+                const balance = getEmployeeBalance(e);
                 let statusBadge = '';
                 if (e.deleted) statusBadge = '<span class="badge deleted">Deleted</span>';
                 else if (e.archived) statusBadge = '<span class="badge archived">Archived</span>';
@@ -1269,21 +1264,7 @@
             document.getElementById('staffName').textContent = user.name;
             document.getElementById('staffRole').textContent = user.title || (user.is_waitress ? 'Waitress' : 'Staff');
 
-            let balance = 0;
-            if (user.is_waitress) {
-                const myTips = appState.tips.filter((t) => t.waitress_name === user.name && !t.paid);
-                balance = Math.floor(myTips.reduce((sum, t) => sum + Math.floor(t.amount * 0.5), 0));
-            } else if (user.title === 'Chef') {
-                const allTips = appState.tips.filter((t) => !t.paid);
-                balance = Math.floor(allTips.reduce((sum, t) => sum + Math.floor(t.amount * 0.25), 0));
-            } else if (user.title === 'Prepcook') {
-                const allTips = appState.tips.filter((t) => !t.paid);
-                balance = Math.floor(allTips.reduce((sum, t) => sum + Math.floor(t.amount * 0.25), 0));
-            }
-
-            const myPayouts = appState.payouts.filter((p) => p.employee_name === user.name && p.status !== 'cancelled');
-            balance -= myPayouts.reduce((sum, p) => sum + p.amount, 0);
-            balance = Math.max(0, balance);
+            const balance = getEmployeeBalance(user);
 
             document.getElementById('staffBalance').textContent = balance.toLocaleString('hu-HU') + ' HUF';
 

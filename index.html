@@ -1018,22 +1018,90 @@
             const amount = parseInt(document.getElementById('tipAmount').value);
             const method = document.getElementById('tipMethod').value;
             const notes = document.getElementById('tipNotes').value;
-
+        
             if (!waitress) {
                 showMessage('recordTipMessage', 'Please select a waitress', 'error');
                 return;
             }
-
+        
+            if (!date || isNaN(amount) || amount <= 0) {
+                showMessage('recordTipMessage', 'Please enter a valid date and amount', 'error');
+                return;
+            }
+        
             try {
-                const res = await fetch(`${API_BASE}/tips`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ waitress_name: waitress, amount, method, date, notes }),
+                // 1. Apply card fee if needed (same total logic as before, adjust if you don’t use fees)
+                let netAmount = amount;
+                if (method === 'card') {
+                    // 5% fee -> keep 95%; change this if your fee is different
+                    netAmount = Math.round(amount * 0.95);
+                }
+        
+                // 2. Calculate shares: 50% waitress, 25% chef, 25% prep
+                const waitressAmount = Math.round(netAmount * 0.5);
+                const chefAmount = Math.round(netAmount * 0.25);
+                const prepAmount = netAmount - waitressAmount - chefAmount; // keeps total correct
+        
+                // 3. Find chef and prep cook in appState.employees
+                //    - Chef = first employee where e.title === 'chef'
+                //    - Prepcook = first employee where e.title === 'prepcook'
+                //      (this matches how employees are stored: is_waitress / title)[file:1]
+                const chef = appState.employees.find(
+                    (e) => !e.deleted && !e.archived && e.title === 'chef'
+                );
+                const prepCook = appState.employees.find(
+                    (e) => !e.deleted && !e.archived && e.title === 'prepcook'
+                );
+        
+                // 4. Build list of tip entries to send
+                const tipEntries = [];
+        
+                // Waitress share (always)
+                tipEntries.push({
+                    waitress_name: waitress,
+                    amount: waitressAmount,
+                    method,
+                    date,
+                    notes: (notes || '') + ' (50% waitress share)',
                 });
-
-                if (!res.ok) throw new Error('Failed to record tip');
-
-                showMessage('recordTipMessage', 'Tip recorded successfully!', 'success');
+        
+                // Chef share (only if chef exists and amount > 0)
+                if (chef && chefAmount > 0) {
+                    tipEntries.push({
+                        waitress_name: chef.name,
+                        amount: chefAmount,
+                        method,
+                        date,
+                        notes: (notes || '') + ' (25% chef share)',
+                    });
+                }
+        
+                // Prep cook share (only if prep cook exists and amount > 0)
+                if (prepCook && prepAmount > 0) {
+                    tipEntries.push({
+                        waitress_name: prepCook.name,
+                        amount: prepAmount,
+                        method,
+                        date,
+                        notes: (notes || '') + ' (25% prep cook share)',
+                    });
+                }
+        
+                // 5. Send all tip entries to the API one by one
+                for (const entry of tipEntries) {
+                    const res = await fetch(`${API_BASE}/tips`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(entry),
+                    });
+        
+                    if (!res.ok) {
+                        throw new Error('Failed to record tip');
+                    }
+                }
+        
+                // 6. UI feedback and refresh
+                showMessage('recordTipMessage', 'Tip recorded and split successfully!', 'success');
                 event.target.reset();
                 await loadAllData();
             } catch (err) {
@@ -1041,45 +1109,6 @@
             }
         }
 
-        // Add Employee
-        async function addEmployee(event) {
-            event.preventDefault();
-            const name = document.getElementById('empName').value;
-            const pin = document.getElementById('empPin').value;
-            const role = document.getElementById('empRole').value;
-
-            if (pin.length !== 4) {
-                alert('PIN must be 4 digits');
-                return;
-            }
-
-            try {
-                const res = await fetch(`${API_BASE}/employees`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        name,
-                        pin,
-                        is_waitress: role === 'waitress',
-                        title: role === 'waitress' ? null : role,
-                    }),
-                });
-
-                if (!res.ok) throw new Error('Failed to add employee');
-
-                alert('Employee added successfully!');
-                document.getElementById('addEmployeeForm').reset();
-                document.getElementById('addEmployeeForm').classList.add('hidden');
-                await loadAllData();
-                renderEmployeesTable();
-            } catch (err) {
-                alert('Error: ' + err.message);
-            }
-        }
-
-        function toggleAddEmployeeForm() {
-            document.getElementById('addEmployeeForm').classList.toggle('hidden');
-        }
 
         // Record Payout
         async function recordPayout(event) {

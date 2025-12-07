@@ -1416,8 +1416,7 @@
 // Modal Functions for Admin Dashboard
 let currentEmployeeId = null;
 
-function openPayoutModal(employeeId) {
-  if (appState.userType !== 'admin') {
+window.openPayoutModal = function(employeeId) {  if (appState.userType !== 'admin') {
     alert('Only admin can process payouts');
     return;
   }
@@ -1432,13 +1431,11 @@ function openPayoutModal(employeeId) {
   document.getElementById('payoutModal').style.display = 'block';
 }
 
-function closePayoutModal() {
-  document.getElementById('payoutModal').style.display = 'none';
+window.closePayoutModal = function() {  document.getElementById('payoutModal').style.display = 'none';
   currentEmployeeId = null;
 }
 
-async function submitPayout() {
-  if (appState.userType !== 'admin') {
+window.submitPayout = async function() {  if (appState.userType !== 'admin') {
     alert('Unauthorized');
     return;
   }
@@ -1478,8 +1475,7 @@ async function submitPayout() {
   }
 }
 
-function openModifyModal(employeeId) {
-  if (appState.userType !== 'admin') {
+window.openModifyModal = function(employeeId) {  if (appState.userType !== 'admin') {
     alert('Only admin can modify tips');
     return;
   }
@@ -1495,13 +1491,11 @@ function openModifyModal(employeeId) {
   document.getElementById('modifyModal').style.display = 'block';
 }
 
-function closeModifyModal() {
-  document.getElementById('modifyModal').style.display = 'none';
+window.closeModifyModal = function() {  document.getElementById('modifyModal').style.display = 'none';
   currentEmployeeId = null;
 }
 
-async function submitModify() {
-  if (appState.userType !== 'admin') {
+window.submitModify = async function() {  if (appState.userType !== 'admin') {
     alert('Unauthorized');
     return;
   }

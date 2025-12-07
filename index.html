@@ -615,15 +615,13 @@
                 </div>
             </div>
 
-            <h2>1169
-            </h2>
             <table class="balances-table">
                 <thead>
                     <tr>
-                                                			<th>Actions</th>
                         <th>Name</th>
                         <th>Role</th>
                         <th>Unpaid Balance (HUF)</th>
+                                                <th>Actions</th>
 
                     </tr>
                 </thead>
@@ -1165,11 +1163,12 @@
 
                 tbody.innerHTML += `
                     <tr>
-                    <td><button class='action-btn payout-btn' onclick='openPayoutModal(${e.employee_id})'>Payout</button><button class='action-btn modify-btn' onclick='openModifyModal(${e.employee_id})'>Modify</button></td>
+                
                         <td>${e.name}</td>
                         <td>${role}</td>
                         <td>${balance.toLocaleString('hu-HU')} HUF</td>
-                       		
+                        <td><button class='action-btn payout-btn' onclick='openPayoutModal(${e.employee_id})'>Payout</button><button class='action-btn modify-btn' onclick='openModifyModal(${e.employee_id})'>Modify</button></td>
+
                     </tr>
                 `;
             });

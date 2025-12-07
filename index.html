@@ -1144,22 +1144,7 @@
             appState.employees.forEach((e) => {
                 if (e.deleted) return;
 
-                let balance = 0;
-
-                if (e.is_waitress) {
-                    const myTips = appState.tips.filter((t) => t.waitress_name === e.name && !t.paid);
-                    balance = Math.floor(myTips.reduce((sum, t) => sum + Math.floor(t.amount * 0.5), 0));
-                } else if (e.title === 'Chef') {
-                    const allTips = appState.tips.filter((t) => !t.paid);
-                    balance = Math.floor(allTips.reduce((sum, t) => sum + Math.floor(t.amount * 0.25), 0));
-                } else if (e.title === 'Prepcook') {
-                    const allTips = appState.tips.filter((t) => !t.paid);
-                    balance = Math.floor(allTips.reduce((sum, t) => sum + Math.floor(t.amount * 0.25), 0));
-                }
-
-                const myPayouts = appState.payouts.filter((p) => p.employee_name === e.name && p.status !== 'cancelled');
-                balance -= myPayouts.reduce((sum, p) => sum + p.amount, 0);
-                balance = Math.max(0, balance);
+                const balance = getEmployeeBalance(e);
 
                 const role = e.title || (e.is_waitress ? 'Waitress' : 'Staff');
 

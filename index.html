@@ -439,6 +439,85 @@
                 padding: 8px;
             }
         }
+
+/* Action Buttons and Modals */
+.action-btn {
+  padding: 5px 10px;
+  margin: 0 5px;
+  font-size: 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+  background-color: #f5f5f5;
+  transition: background-color 0.2s;
+}
+.action-btn:hover {
+  background-color: #e0e0e0;
+}
+.payout-btn {
+  background-color: #ff9800;
+  color: white;
+  border-color: #ff9800;
+}
+.payout-btn:hover {
+  background-color: #e68900;
+}
+.modify-btn {
+  background-color: #2196F3;
+  color: white;
+  border-color: #2196F3;
+}
+.modify-btn:hover {
+  background-color: #0b7dda;
+}
+.modal {
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+}
+.modal-content {
+  background-color: #fefefe;
+  margin: 15% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%;
+  max-width: 400px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+.modal-content h2 {
+  margin-top: 0;
+  color: #333;
+}
+.modal-content input,
+.modal-content textarea {
+  width: 100%;
+  padding: 8px;
+  margin: 10px 0;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+.modal-content button {
+  background-color: #4CAF50;
+  color: white;
+  padding: 10px 20px;
+  margin: 5px 5px 5px 0;
+  border: none;
+  cursor: pointer;
+}
+.modal-content button:hover {
+  background-color: #45a049;
+}
+.modal-content button:last-child {
+  background-color: #f44336;
+}
+.modal-content button:last-child:hover {
+  background-color: #da190b;
+}
     </style>
 </head>
 <body>

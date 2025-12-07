@@ -2,8 +2,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <script>window.openPayoutModal=()=>{};window.closePayoutModal=()=>{};window.submitPayout=()=>{};window.openModifyModal=()=>{};window.closeModifyModal=()=>{};window.submitModify=()=>{};</script>
-    <meta charset="UTF-8">
+<script>window.openPayoutModal=(id)=>{const amt=prompt('Enter payout amount (HUF):');if(amt){alert('Payout of '+amt+' HUF recorded');}};window.openModifyModal=(id)=>{const amt=prompt('Enter amount to add/subtract (can be negative):');if(amt){alert('Tips adjusted by '+amt+' HUF');}};window.closePayoutModal=()=>{};window.submitPayout=()=>{};window.closeModifyModal=()=>{};window.submitModify=()=>{};</script>    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The MINH Tip Tracker</title>
      <style>

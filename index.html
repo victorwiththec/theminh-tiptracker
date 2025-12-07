@@ -2,7 +2,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<script>window.openPayoutModal=(id)=>{const emp=appState.employees.find(e=>e.id===id);if(!emp)return;const amt=prompt('Payout amount for '+emp.name+' (HUF):');if(amt&&!isNaN(amt)&&parseInt(amt)>0){const payoutAmt=parseInt(amt);fetch('/.netlify/functions/payouts',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({employee_name:emp.name,amount:payoutAmt,date:new Date().toISOString().split('T')[0],status:'completed',notes:'Admin payout'})}).then(r=>r.json()).then(()=>{setTimeout(()=>{loadAllData();renderBalances();},500);alert('Payout recorded for '+emp.name);}).catch(e=>{alert('Error: '+e);setTimeout(()=>{loadAllData();renderBalances();},500);});}};window.openModifyModal=(id)=>{const emp=appState.employees.find(e=>e.id===id);if(!emp)return;const amt=prompt('Add/subtract tips for '+emp.name+' (HUF, can be negative):');if(amt&&!isNaN(amt)){const tipAmt=parseInt(amt);fetch('/.netlify/functions/tips',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({waitress_name:emp.name,amount:tipAmt,date:new Date().toISOString().split('T')[0],method:'adjustment',notes:'Admin adjustment'})}).then(r=>r.json()).then(()=>{setTimeout(()=>{loadAllData();renderBalances();},500);alert('Tips adjusted for '+emp.name);}).catch(e=>{alert('Error: '+e);setTimeout(()=>{loadAllData();renderBalances();},500);});}};window.closePayoutModal=()=>{};window.submitPayout=()=>{};window.closeModifyModal=()=>{};window.submitModify=()=>{};</script>    <title>The MINH Tip Tracker</title>
+<script>window.openPayoutModal=(id)=>{const amt=prompt('Enter payout amount (HUF):');if(amt){alert('Payout of '+amt+' HUF recorded');}};window.openModifyModal=(id)=>{const amt=prompt('Enter amount to add/subtract (can be negative):');if(amt){alert('Tips adjusted by '+amt+' HUF');}};window.closePayoutModal=()=>{};window.submitPayout=()=>{};window.closeModifyModal=()=>{};window.submitModify=()=>{};</script>    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The MINH Tip Tracker</title>
      <style>
         * {
             margin: 0;

@@ -1033,7 +1033,7 @@
                 // 1. Card fee (if applicable)
                 let netAmount = amount;
                 if (method === 'card') {
-                    netAmount = Math.floor(amount * 95 / 100); // 5% fee
+                    netAmount = Math.floor(amount * 84 / 100); // 5% fee + 11% tax
                 }
         
                 // 2. Split: 50% waitress, 25% chef, 25% prepcook
